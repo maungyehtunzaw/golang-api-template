@@ -27,7 +27,7 @@ func SetupRouter(db *gorm.DB, rdb *redis.Client, cfg *config.Config) *gin.Engine
 	userRepo := repository.NewUserRepository(db)
 
 	// Services
-	userService := service.NewUserService(userRepo, rdb) // from previous examples
+	userService := service.NewUserService(userRepo) // from previous examples
 	authService := service.NewAuthService(userRepo, rdb, cfg)
 
 	// Handlers
@@ -43,16 +43,17 @@ func SetupRouter(db *gorm.DB, rdb *redis.Client, cfg *config.Config) *gin.Engine
 		v1.POST("/auth/logout", authHandler.Logout)
 
 		// Registration - example
-		v1.POST("/users/register", userHandler.Register)
+		// v1.POST("/users/register", authHandler.Register)
 	}
 
 	// Protected routes
-	auth := v1.Group("/")
-	auth.Use(middlewares.AuthMiddleware(cfg)) // JWT checking
+	auth := v1.Group("/users")
+	auth.Use(middlewares.AuthMiddleware(cfg)) // e.g. checks valid JWT
 	{
-		auth.GET("/users/:id", userHandler.GetUserByID)
-		auth.GET("/users", userHandler.ListUsers)
-		// ...
+		auth.GET("/:id", userHandler.GetByID)
+		auth.GET("/", userHandler.List)
+		auth.PUT("/:id", userHandler.Update)
+		auth.DELETE("/:id", userHandler.Delete)
 	}
 
 	return r
