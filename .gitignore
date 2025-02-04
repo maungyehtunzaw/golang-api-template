@@ -20,6 +20,7 @@
 build/
 dist/
 bin/
+vendor/
 
 # -----------------------------------------
 # IDE and Editor directories/files
