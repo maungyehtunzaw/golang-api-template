@@ -1,0 +1,6 @@
+POST /api/v1/users/register
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "secret"
+}

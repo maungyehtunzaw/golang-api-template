@@ -1,0 +1,41 @@
+# -----------------------------------------
+# Go-related artifacts
+# -----------------------------------------
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Output of the go coverage tool
+*.out
+
+# If you prefer not to commit your vendor folder, uncomment:
+# vendor/
+
+# -----------------------------------------
+# Build directories
+# -----------------------------------------
+build/
+dist/
+bin/
+
+# -----------------------------------------
+# IDE and Editor directories/files
+# -----------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------------------------
+# OS-specific files
+# -----------------------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------------------
+# Environment/Config files
+# -----------------------------------------
+.env
