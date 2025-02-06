@@ -55,3 +55,12 @@ func T(c *gin.Context, key string) string {
 	}
 	return val
 }
+
+func TT(lang, key string) string {
+	if msgs, exists := translations[lang]; exists {
+		if msg, exists := msgs[key]; exists {
+			return msg
+		}
+	}
+	return key // Fallback to the key itself if not found
+}

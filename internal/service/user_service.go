@@ -1,8 +1,12 @@
 package service
 
 import (
+	"crypto/rand"
 	"errors"
+	"fmt"
+	"time"
 
+	"golang-api-template/internal/config"
 	"golang-api-template/internal/models"
 	"golang-api-template/internal/repository"
 	"golang-api-template/internal/utils"
@@ -16,6 +20,11 @@ type UserService interface {
 	GetAllUsers(p utils.PaginationParams) ([]models.User, int64, error)
 	UpdateUser(id uint, name, email, password string) (*models.User, error)
 	DeleteUser(id uint) error
+	GetPermissionsByUserID(userID uint) ([]models.Permission, error)
+
+	FindByEmail(email string) (*models.User, error)
+	GeneratePasswordResetToken(user *models.User) (string, error)
+	ResetPassword(token, newPassword string) error
 }
 
 type userService struct {
@@ -37,7 +46,7 @@ func (s *userService) CreateUser(name, email, password string) (*models.User, er
 	}
 
 	// Hash password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
 		return nil, err
 	}
@@ -102,4 +111,39 @@ func (s *userService) UpdateUser(id uint, name, email, password string) (*models
 // DELETE
 func (s *userService) DeleteUser(id uint) error {
 	return s.repo.DeleteUser(id)
+}
+
+func (s *userService) GetPermissionsByUserID(userID uint) ([]models.Permission, error) {
+	return s.repo.GetPermissionsByUserID(userID)
+}
+
+func (s *userService) FindByEmail(email string) (*models.User, error) {
+	return s.repo.FindByEmail(email)
+}
+
+func (s *userService) GeneratePasswordResetToken(user *models.User) (string, error) {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err // handle random generator error
+	}
+	token := fmt.Sprintf("%x", b)
+	expiry := time.Now().Add(config.GetResetTokenExpiry()) // Assuming config package has this method
+
+	// Store the token in the database with an expiration time
+	if err := s.repo.SaveResetToken(user.ID, token, expiry); err != nil {
+		return "", err // handle database error
+	}
+
+	return token, nil
+}
+func (s *userService) ResetPassword(token, newPassword string) error {
+	user, err := s.repo.FindByToken(token)
+	if err != nil {
+		return err
+	}
+
+	// Additional checks, such as token expiration, can be implemented here
+	hashedPassword, _ := utils.HashPassword(newPassword) // Assuming you have a HashPassword method
+	return s.repo.UpdatePassword(user.ID, hashedPassword)
 }

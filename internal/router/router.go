@@ -23,6 +23,9 @@ func SetupRouter(db *gorm.DB, rdb *redis.Client, cfg *config.Config) *gin.Engine
 	// Middlewares
 	r.Use(middlewares.LocaleMiddleware())
 
+	emailConfig := config.GetEmailConfig()
+	emailService := service.NewEmailService(emailConfig)
+
 	// Repos
 	userRepo := repository.NewUserRepository(db)
 
@@ -31,8 +34,12 @@ func SetupRouter(db *gorm.DB, rdb *redis.Client, cfg *config.Config) *gin.Engine
 	authService := service.NewAuthService(userRepo, rdb, cfg)
 
 	// Handlers
-	userHandler := handlers.NewUserHandler(userService)
+	userHandler := handlers.NewUserHandler(userService, emailService)
 	authHandler := handlers.NewAuthHandler(authService)
+
+	roleRepo := repository.NewRoleRepository(db)
+	roleService := service.NewRoleService(roleRepo)
+	roleHandler := handlers.NewRoleHandler(roleService)
 
 	// Public routes
 	v1 := r.Group("/api/v1")
@@ -41,14 +48,20 @@ func SetupRouter(db *gorm.DB, rdb *redis.Client, cfg *config.Config) *gin.Engine
 		v1.POST("/auth/login", authHandler.Login)
 		v1.POST("/auth/refresh", authHandler.RefreshToken)
 		v1.POST("/auth/logout", authHandler.Logout)
+		v1.POST("/auth/register", userHandler.Create)
 
-		// Registration - example
-		// v1.POST("/users/register", authHandler.Register)
+		v1.POST("/roles", roleHandler.CreateRole)
+		v1.GET("/roles", roleHandler.GetAllRoles)
+		v1.GET("/roles/:id", roleHandler.GetRoleByID)
+		v1.PUT("/roles/:id", roleHandler.UpdateRole)
+		v1.DELETE("/roles/:id", roleHandler.DeleteRole)
+
+		v1.GET("/roles/:id/permissions", roleHandler.GetPermissionsByRoleID)
+		v1.GET("/users/:id/permissions", userHandler.GetPermissionsByUserID)
 	}
 
 	// Protected routes
 	auth := v1.Group("/users")
-	auth.POST("/register", userHandler.Create)
 
 	auth.Use(middlewares.AuthMiddleware(cfg)) // e.g. checks valid JWT
 	{

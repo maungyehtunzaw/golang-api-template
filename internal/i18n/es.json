@@ -9,5 +9,10 @@
   "EmailTaken": "El correo ya está en uso",
   "CreateUserError": "Error al crear usuario",
   "UpdateUserError": "Error al actualizar usuario",
-  "DeleteUserError": "Error al eliminar usuario"
+  "DeleteUserError": "Error al eliminar usuario",
+
+  "PasswordResetRequestSuccess": "Si su correo está registrado, recibirá un enlace para restablecer su contraseña.",
+  "PasswordResetSuccess": "Su contraseña ha sido restablecida correctamente",
+  "InvalidOrExpiredToken": "Token inválido o caducado",
+  "EmailVerificationLink": "Por favor, verifique su correo electrónico haciendo clic en el enlace que le hemos enviado."
 }

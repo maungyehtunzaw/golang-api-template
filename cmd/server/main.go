@@ -25,6 +25,15 @@ func main() {
 	}
 	config.AutoMigrate(db)
 
+	// emailConfig := config.GetEmailConfig()
+	// emailService := service.NewEmailService(emailConfig)
+
+	// // Example: Send a test email upon startup
+	// err100 := emailService.SendEmail("test@example.com", "Test Email", "Hello, this is a test email from our application.")
+	// if err100 != nil {
+	// 	log.Fatalf("Failed to send test email: %v", err)
+	// }
+
 	// Setup Redis
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

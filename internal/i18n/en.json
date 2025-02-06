@@ -9,5 +9,13 @@
   "EmailTaken": "Email is already taken",
   "CreateUserError": "Failed to create user",
   "UpdateUserError": "Failed to update user",
-  "DeleteUserError": "Failed to delete user"
+  "DeleteUserError": "Failed to delete user",
+
+  "PasswordResetRequestSuccess": "If your email is registered, you will receive a password reset link.",
+  "PasswordResetSuccess": "Your password has been reset successfully",
+  "InvalidOrExpiredToken": "Invalid or expired token",
+  "EmailVerificationLink": "Please verify your email by clicking on the link we've sent you.",
+
+  "PasswordResetEmailSubject": "Password Reset Request",
+    "PasswordResetEmailBody": "Please click on the following link to reset your password: %s"
 }

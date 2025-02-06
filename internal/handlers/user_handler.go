@@ -13,11 +13,15 @@ import (
 )
 
 type UserHandler struct {
-	userService service.UserService
+	userService  service.UserService
+	emailService *service.EmailService
 }
 
-func NewUserHandler(us service.UserService) *UserHandler {
-	return &UserHandler{userService: us}
+func NewUserHandler(us service.UserService, es *service.EmailService) *UserHandler {
+	return &UserHandler{
+		userService:  us,
+		emailService: es, // Initialize the EmailService here
+	}
 }
 
 // CREATE
@@ -136,4 +140,67 @@ func (h *UserHandler) Delete(c *gin.Context) {
 	}
 
 	response.Success(c, http.StatusOK, i18n.T(c, "UserDeleted"), nil)
+}
+
+func (h *UserHandler) GetPermissionsByUserID(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	permissions, err := h.userService.GetPermissionsByUserID(uint(userID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, permissions)
+}
+
+func (h *UserHandler) ForgotPassword(c *gin.Context) {
+	var request struct {
+		Email string `json:"email"`
+	}
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": i18n.T(c, "InvalidInput")})
+		return
+	}
+
+	user, err := h.userService.FindByEmail(request.Email)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"message": i18n.T(c, "PasswordResetRequestSuccess")})
+		return
+	}
+
+	resetToken, err := h.userService.GeneratePasswordResetToken(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": i18n.T(c, "PasswordResetRequestError")})
+		return
+	}
+	resetLink := "https://example.com/reset_password?token=" + resetToken
+	lang := c.GetString("locale") // Ensure that the locale middleware sets this.
+
+	go h.emailService.SendPasswordResetEmail(user.Email, resetLink, lang)
+
+	c.JSON(http.StatusOK, gin.H{"message": i18n.T(c, "PasswordResetRequestSuccess")})
+}
+
+func (h *UserHandler) ResetPassword(c *gin.Context) {
+	var request struct {
+		Token    string `json:"token"`
+		Password string `json:"password"`
+	}
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": i18n.T(c, "InvalidInput")})
+		return
+	}
+
+	err := h.userService.ResetPassword(request.Token, request.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": i18n.T(c, "InvalidOrExpiredToken")})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": i18n.T(c, "PasswordResetSuccess")})
 }

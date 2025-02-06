@@ -2,8 +2,10 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
+	"time"
 
 	"golang-api-template/internal/models"
 
@@ -25,16 +27,20 @@ type Config struct {
 	JWTRefreshSecret      string
 	AccessTokenExpireMin  int
 	RefreshTokenExpireHrs int
+	RestTokenExpireInMin  int
 
 	// ... possibly more fields
 	Redis *RedisConfig
 }
 
 func LoadConfig() (*Config, error) {
-	_ = godotenv.Load() // optionally load from .env
+	if err := godotenv.Load(); err != nil {
+		log.Printf("No .env file found, using default environment variables")
+	}
 
 	accessExp, _ := strconv.Atoi(getEnv("ACCESS_TOKEN_EXPIRE_MIN", "15"))
 	refreshExp, _ := strconv.Atoi(getEnv("REFRESH_TOKEN_EXPIRE_HOUR", "72"))
+	resetTokenExpire, _ := strconv.Atoi(getEnv("RESET_TOKEN_EXPIRY_MIN", "15"))
 
 	cfg := &Config{
 		DBHost:     getEnv("DB_HOST", "127.0.0.1"),
@@ -46,6 +52,7 @@ func LoadConfig() (*Config, error) {
 
 		JWTAccessSecret:       getEnv("JWT_ACCESS_SECRET", "access-secret-example"),
 		JWTRefreshSecret:      getEnv("JWT_REFRESH_SECRET", "refresh-secret-example"),
+		RestTokenExpireInMin:  resetTokenExpire,
 		AccessTokenExpireMin:  accessExp,
 		RefreshTokenExpireHrs: refreshExp,
 
@@ -70,7 +77,17 @@ func SetupDatabase(cfg *Config) (*gorm.DB, error) {
 }
 
 func AutoMigrate(db *gorm.DB) {
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.User{}, &models.Role{}, &models.Permission{})
+}
+
+func GetResetTokenExpiry() time.Duration {
+	// Convert the environment variable to an integer
+	expiryMinutes, err := strconv.Atoi(getEnv("RESET_TOKEN_EXPIRY_MIN", "15"))
+	if err != nil {
+		// Handle error or fall back to a default value
+		expiryMinutes = 15 // Default to 15 minutes if there's an error
+	}
+	return time.Minute * time.Duration(expiryMinutes)
 }
 
 // Helper
