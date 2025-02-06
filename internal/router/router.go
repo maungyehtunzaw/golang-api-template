@@ -48,10 +48,13 @@ func SetupRouter(db *gorm.DB, rdb *redis.Client, cfg *config.Config) *gin.Engine
 
 	// Protected routes
 	auth := v1.Group("/users")
+	auth.POST("/register", userHandler.Create)
+
 	auth.Use(middlewares.AuthMiddleware(cfg)) // e.g. checks valid JWT
 	{
 		auth.GET("/:id", userHandler.GetByID)
 		auth.GET("/", userHandler.List)
+
 		auth.PUT("/:id", userHandler.Update)
 		auth.DELETE("/:id", userHandler.Delete)
 	}

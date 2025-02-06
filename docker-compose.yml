@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    environment:
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PORT=6379
+      - REDIS_PASS=my_redis_password_&&11
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass my_redis_password_&&11
