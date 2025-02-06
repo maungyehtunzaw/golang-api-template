@@ -1,5 +1,13 @@
 {
-    "Hello": "Hola",
-    "UserNotFound": "Usuario no encontrado"
-  }
-  
+  "InvalidUserID": "ID de usuario inválido",
+  "UserNotFound": "Usuario no encontrado",
+  "UserCreated": "Usuario creado con éxito",
+  "UserRetrieved": "Usuario obtenido con éxito",
+  "ListOfUsers": "Lista de usuarios",
+  "UserUpdated": "Usuario actualizado con éxito",
+  "UserDeleted": "Usuario eliminado con éxito",
+  "EmailTaken": "El correo ya está en uso",
+  "CreateUserError": "Error al crear usuario",
+  "UpdateUserError": "Error al actualizar usuario",
+  "DeleteUserError": "Error al eliminar usuario"
+}

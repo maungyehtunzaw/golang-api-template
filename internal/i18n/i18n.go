@@ -10,14 +10,14 @@ import (
 
 // For simplicity, we embed translation JSON files
 //
-//go:embed en.json es.json
+//go:embed en.json es.json my.json
 var translationsFS embed.FS
 
 var translations = map[string]map[string]string{}
 
 // Initialize loads all translations into memory
 func Initialize() error {
-	files := []string{"en.json", "es.json"}
+	files := []string{"en.json", "es.json", "my.json"}
 	for _, file := range files {
 		data, err := translationsFS.ReadFile(file)
 		if err != nil {

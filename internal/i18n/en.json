@@ -1,5 +1,13 @@
 {
-    "Hello": "Hello",
-    "UserNotFound": "User not found"
-  }
-  
+  "InvalidUserID": "Invalid user ID",
+  "UserNotFound": "User not found",
+  "UserCreated": "User created successfully",
+  "UserRetrieved": "User retrieved successfully",
+  "ListOfUsers": "List of users",
+  "UserUpdated": "User updated successfully",
+  "UserDeleted": "User deleted successfully",
+  "EmailTaken": "Email is already taken",
+  "CreateUserError": "Failed to create user",
+  "UpdateUserError": "Failed to update user",
+  "DeleteUserError": "Failed to delete user"
+}
