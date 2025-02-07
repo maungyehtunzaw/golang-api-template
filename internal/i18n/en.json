@@ -17,5 +17,8 @@
   "EmailVerificationLink": "Please verify your email by clicking on the link we've sent you.",
 
   "PasswordResetEmailSubject": "Password Reset Request",
-    "PasswordResetEmailBody": "Please click on the following link to reset your password: %s"
+  "PasswordResetEmailBody": "Please click on the following link to reset your password: %s",
+  
+  "UserFound": "User found"
+  
 }

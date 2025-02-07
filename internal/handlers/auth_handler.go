@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
+	"golang-api-template/internal/i18n"
 	"golang-api-template/internal/service"
 	"golang-api-template/pkg/response"
 
@@ -28,10 +30,16 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := h.authService.Login(req.Email, req.Password)
+	accessToken, refreshToken, user, err := h.authService.Login(req.Email, req.Password)
 	if err != nil {
 		// Use our Error response with a 401 status code
 		response.Error(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	err = h.authService.TrackUserLogin(user.ID)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, fmt.Errorf("failed to track user login: %w", err).Error())
 		return
 	}
 
@@ -39,6 +47,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Login successful", gin.H{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+		"user":          user,
 	})
 }
 
@@ -79,4 +88,26 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	}
 
 	response.Success(c, http.StatusOK, "Logout successful", nil)
+}
+
+func (h *AuthHandler) GetAuthUser(c *gin.Context) {
+	// you can use here to get user
+	userId, exists := c.Get("AuthID")
+	if !exists {
+		response.Error(c, http.StatusInternalServerError, "Error getting user ID")
+		return
+	}
+	fmt.Println("User ID:", userId)
+	user, err := h.authService.GetAuthUser(c)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	userResponse := response.AuthUserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+
+	response.Success(c, http.StatusOK, i18n.T(c, "UserFound"), userResponse)
 }

@@ -49,6 +49,7 @@ func SetupRouter(db *gorm.DB, rdb *redis.Client, cfg *config.Config) *gin.Engine
 		v1.POST("/auth/refresh", authHandler.RefreshToken)
 		v1.POST("/auth/logout", authHandler.Logout)
 		v1.POST("/auth/register", userHandler.Create)
+		v1.POST("/auth/forgot-password", userHandler.ForgotPassword)
 
 		v1.POST("/roles", roleHandler.CreateRole)
 		v1.GET("/roles", roleHandler.GetAllRoles)
@@ -67,6 +68,7 @@ func SetupRouter(db *gorm.DB, rdb *redis.Client, cfg *config.Config) *gin.Engine
 	{
 		auth.GET("/:id", userHandler.GetByID)
 		auth.GET("/", userHandler.List)
+		auth.GET("/getuser", authHandler.GetAuthUser)
 
 		auth.PUT("/:id", userHandler.Update)
 		auth.DELETE("/:id", userHandler.Delete)

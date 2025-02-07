@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -33,7 +34,8 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 		// Optionally store user ID in context
 		userID, ok := claims["user_id"].(float64)
 		if ok {
-			c.Set("userID", uint(userID))
+			fmt.Println("User ID:", userID)
+			c.Set("AuthID", uint(userID))
 		}
 
 		c.Next()
