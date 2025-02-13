@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"golang-api-template/internal/config"
+	"golang-api-template/internal/migrations"
 	"golang-api-template/internal/router"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -23,7 +24,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("DB setup error: %v", err)
 	}
-	config.AutoMigrate(db)
+	if err := migrations.AutoMigrateDatabase(db); err != nil {
+		log.Fatalf("Error migrating database: %v", err)
+	}
 
 	// emailConfig := config.GetEmailConfig()
 	// emailService := service.NewEmailService(emailConfig)

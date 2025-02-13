@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"golang-api-template/internal/models"
-
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -76,9 +74,9 @@ func SetupDatabase(cfg *Config) (*gorm.DB, error) {
 	return db, nil
 }
 
-func AutoMigrate(db *gorm.DB) {
-	db.AutoMigrate(&models.User{}, &models.Role{}, &models.Permission{})
-}
+// func AutoMigrate(db *gorm.DB) {
+// 	db.AutoMigrate(&models.User{}, &models.Role{}, &models.Permission{})
+// }
 
 func GetResetTokenExpiry() time.Duration {
 	// Convert the environment variable to an integer
